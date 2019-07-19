@@ -1,0 +1,4 @@
+node_modules
+nvm
+yarn.lock
+dist
