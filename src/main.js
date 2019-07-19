@@ -5,7 +5,7 @@ class App {
     this.repositories = [];
     
     this.formEl = document.getElementById('repo-form');
-
+    
     this.listEl = document.getElementById('repo-list');
     this.inputEl = document.querySelector('input[name=repository]');
     this.registerHandlers();
@@ -15,6 +15,18 @@ class App {
     this.formEl.onsubmit = event => this.addRepository(event);
   }
   
+  setLoading (loading = true) {
+    if (loading === true) {
+      let loadEl = document.createElement('span');
+      loadEl.appendChild(document.createTextNode('Carregando'));
+      loadEl.setAttribute('id', 'loading');
+
+      this.formEl.appendChild(loadEl);
+    } else {
+      document.getElementById('loading').remove(); 
+    }
+  }
+
   async addRepository(event) {
     event.preventDefault();
     const repoInput = this.inputEl.value;
@@ -23,38 +35,47 @@ class App {
       return;
     }
     
-    const response = await api.get(`/repos/${repoInput}`);
-    
-    console.log(response);
+    this.setLoading();
 
-    const { name, description, html_url, owner: { avatar_url } } = response.data;
+    try {
+      const response = await api.get(`/repos/${repoInput}`);
+      
+      console.log(response);
+      
+      
+      const { name, description, html_url, owner: { avatar_url } } = response.data;
+      
+      this.repositories.push({
+        name,
+        description,
+        html_url,
+        avatar_url,
+        html_url,
+      });
+      
+      this.inputEl.value = '';
+      
+      this.render();
+    } catch (err) {
+      alert('O repo não existe!');
+    }
 
-    this.repositories.push({
-      name,
-      description,
-      html_url,
-      avatar_url,
-      html_url,
-    });
-
-    this.inputEl.value = '';
-
-    this.render();
+    this.setLoading(false);
   }
-
+  
   render() {
     this.listEl.innerHTML = "";
-
+    
     this.repositories.forEach(repo => {
       let imgEl = document.createElement('img');
       imgEl.setAttribute('src', repo.avatar_url );
-
+      
       let titleEl = document.createElement('strong');
       titleEl.appendChild(document.createTextNode(repo.name));
-
+      
       let descriptionEl = document.createElement('p');
       descriptionEl.appendChild(document.createTextNode(repo.description));
-
+      
       let linkEl = document.createElement('a');
       linkEl.setAttribute('target', '_blank');
       linkEl.setAttribute('href', repo.html_url);
@@ -65,9 +86,9 @@ class App {
       listItemEl.appendChild(titleEl);
       listItemEl.appendChild(descriptionEl);
       listItemEl.appendChild(linkEl);
-
+      
       this.listEl.appendChild(listItemEl);
-
+      
     });
   }
 }
