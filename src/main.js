@@ -1,13 +1,28 @@
-import axios from 'axios';
-
-const buscaUsuario = async usuario => {
-  const response = await axios.get(`https://api.github.com/users/${usuario}`);
+class App {
+  constructor() {
+    this.repositories = [];
+    
+    this.formEl = document.getElementById('repo-form');
+    
+    this.registerHandlers();
+  }  
   
-  try {
-    console.log(response.data);
-  } catch (error) {
-    console.log('Usuário não existe');
+  registerHandlers() {
+    this.formEl.onsubmit = event => this.addRepository(event);
   }
-};
+  
+  addRepository(event) {
+    event.preventDefault();
 
-buscaUsuario('diego3g');
+    this.repositories.push({
+      name: 'rocketseat.com.br',
+      description: 'Tire sua ideia do papel e de vida a sua startup',
+      avatar_url: 'https://avatars2.githubusercontent.com/u/28929274?v=4',
+      html_url: 'http://github.com/Rocketseat/starter-javascript-es6-exercicios',
+    });
+
+    console.log(this.repositories);
+  }
+}
+
+new App();
